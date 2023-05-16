@@ -102,7 +102,7 @@ def train_coco(batch_size : int, input_shape : int, data_name : str, lr_decay_st
     '''
     call = f'python3 ./coco_train_script.py -p adamw -b {batch_size} -i {input_shape} --data_name {data_name} --lr_decay_steps {lr_decay_steps} --lr_cooldown_steps {lr_cooldown_steps} --freeze_backbone_epochs {freeze_backbone_epochs}'
     # os.system(f'python3 ./coco_train_script.py -p adamw -b {batch_size} -i {input_shape} --data_name {data_name} --lr_decay_steps {lr_decay_steps} --lr_cooldown_steps {lr_cooldown_steps} --freeze_backbone_epochs {freeze_backbone_epochs}')
-    subprocess.run(call.split(' '), capture_output=True)
+    print(subprocess.check_output(call.split(' ')))
 
 
 
