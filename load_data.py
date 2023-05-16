@@ -4,6 +4,7 @@ from fiftyone import ViewField as F
 import os
 import typing
 import glob
+from tqdm import tqdm
 import custom_dataset_script
 
 
@@ -59,7 +60,7 @@ def load_dataset_subset(name: str, anno_path : str, img_path : str, split_path :
     # for i in open(split_path, 'r').readlines():
     #     if i.strip().split(" ")[-1] != "-1":
     #         valid_files.append(i.strip().split(" ")[0])
-    filenames = [f'{img_path}/{i.strip().split(" ")[0]}.{extension}' for i in open(split_path, 'r').readlines() if i.strip().split(" ")[-1] != "-1"]
+    filenames = [f'{img_path}/{i.strip().split(" ")[0]}.{extension}' for i in tqdm(open(split_path, 'r').readlines()) if i.strip().split(" ")[-1] != "-1"]
     dataset = fo.Dataset.from_dir(
         dataset_type=fo.types.VOCDetectionDataset,
         data_path=img_path,
