@@ -6,6 +6,7 @@ import typing
 import glob
 from tqdm import tqdm
 import custom_dataset_script
+import subprocess
 
 
 def load_dataset(name: str, anno_path : str, img_path : str, load_split : bool = False, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
@@ -99,7 +100,9 @@ def train_coco(batch_size : int, input_shape : int, data_name : str, lr_decay_st
     Wrapper around coco_train_script:
     !python3 ./coco_train_script.py -p adamw -b 8 -i 512 --data_name exp_conv.json --lr_decay_steps 20 --lr_cooldown_steps 1 --freeze_backbone_epochs 8
     '''
-    os.system(f'python3 ./coco_train_script.py -p adamw -b {batch_size} -i {input_shape} --data_name {data_name} --lr_decay_steps {lr_decay_steps} --lr_cooldown_steps {lr_cooldown_steps} --freeze_backbone_epochs {freeze_backbone_epochs}')
+    call = f'python3 ./coco_train_script.py -p adamw -b {batch_size} -i {input_shape} --data_name {data_name} --lr_decay_steps {lr_decay_steps} --lr_cooldown_steps {lr_cooldown_steps} --freeze_backbone_epochs {freeze_backbone_epochs}'
+    # os.system(f'python3 ./coco_train_script.py -p adamw -b {batch_size} -i {input_shape} --data_name {data_name} --lr_decay_steps {lr_decay_steps} --lr_cooldown_steps {lr_cooldown_steps} --freeze_backbone_epochs {freeze_backbone_epochs}')
+    subprocess.run(call.split(' '), capture_output=True)
 
 
 
@@ -108,5 +111,8 @@ if __name__ == '__main__':
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
     ds = load_dataset_subset('dogiss', '/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations', '/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages', '../Datasets/VOC2012/ImageSets/Main/dog_train.txt')
-    sesh = fo.launch_app(ds)
-    sesh.wait(-1)
+    convert_dataset(ds, 'ground_truth', 'exported')
+    custom_dataset('exported', 0.1, 'train.json')
+    train_coco(8, 512, 'train.json', 20, 1, 8)
+
+    
