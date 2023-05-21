@@ -1,9 +1,9 @@
 {
     "help": "==SUPPRESS==",
-    "data_name": "imagenet2012",
-    "input_shape": 160,
+    "data_name": "exported_trainval.json",
+    "input_shape": 512,
     "model": "aotnet.AotNet50",
-    "batch_size": 256,
+    "batch_size": 8,
     "epochs": -1,
     "optimizer": "LAMB",
     "initial_epoch": 0,

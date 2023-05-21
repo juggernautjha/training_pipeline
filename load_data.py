@@ -7,6 +7,7 @@ import glob
 from tqdm import tqdm
 import custom_dataset_script
 import subprocess
+
 import train_coco_config
 import train_with_config 
 
@@ -70,7 +71,6 @@ def load_dataset_subset(name: str, anno_path : str, img_path : str, split_path :
         name=name
     )
 
-    cnt = 0;
     for sample in dataset:
         if (sample.filepath not in filenames):
             dataset.delete_samples(sample)
@@ -138,6 +138,10 @@ if __name__ == '__main__':
     # broken_dataset = load_dataset("bloodcells", "BCCD/Annotations", "BCCD/JPEGImages", True, "BCCD/ImageSets/Main/train.txt")
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
-    train_using_config('train_config.json', False)
+    train_using_config(
+        'train_config.json',
+        False
+    )
+
 
     

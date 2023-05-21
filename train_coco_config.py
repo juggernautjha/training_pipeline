@@ -9,6 +9,7 @@ from keras_cv_attention_models.imagenet import (
     init_model,
     train,
 )
+
 import pycocotools  # Try import first, not using here, just in case it throws error later
 
 
@@ -18,8 +19,9 @@ class dotdict(dict):
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
+
+
 def parse_arguments(file):
-    import json
     file = open(file, 'r')
     # print(file.read())
     args = json.load(file)
@@ -160,7 +162,6 @@ def run_training_by_args(args):
 
 if __name__ == "__main__":
     import sys
-
     args = parse_arguments(sys.argv[1])
     cyan_print = lambda ss: print("\033[1;36m" + ss + "\033[0m")
     if args.freeze_backbone_epochs - args.initial_epoch > 0:
@@ -169,7 +170,6 @@ if __name__ == "__main__":
         args.additional_det_header_kwargs.update({"freeze_backbone": True})
         args.epochs = args.freeze_backbone_epochs
         model, latest_save, _ = run_training_by_args(args)
-
         cyan_print(">>>> Unfreezing backbone")
         args.additional_det_header_kwargs.update({"freeze_backbone": False})
         args.initial_epoch = args.freeze_backbone_epochs
@@ -177,5 +177,4 @@ if __name__ == "__main__":
         args.backbone_pretrained = None
         args.restore_path = None
         args.pretrained = latest_save  # Build model and load weights
-
     run_training_by_args(args)
