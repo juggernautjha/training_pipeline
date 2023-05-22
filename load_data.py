@@ -8,6 +8,8 @@ from tqdm import tqdm
 import custom_dataset_script
 import subprocess
 
+import train_coco_config
+import train_with_config 
 
 def load_dataset(name: str, anno_path : str, img_path : str, load_split : bool = False, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
     ''' Loads VOC dataset and returns a dataset object. Need to specify directory containing
@@ -69,7 +71,6 @@ def load_dataset_subset(name: str, anno_path : str, img_path : str, split_path :
         name=name
     )
 
-    cnt = 0;
     for sample in dataset:
         if (sample.filepath not in filenames):
             dataset.delete_samples(sample)
@@ -104,15 +105,43 @@ def train_coco(batch_size : int, input_shape : int, data_name : str, lr_decay_st
     # os.system(f'python3 ./coco_train_script.py -p adamw -b {batch_size} -i {input_shape} --data_name {data_name} --lr_decay_steps {lr_decay_steps} --lr_cooldown_steps {lr_cooldown_steps} --freeze_backbone_epochs {freeze_backbone_epochs}')
     print(subprocess.check_output(call.split(' ')))
 
+def train_using_config(config_file : str, coco : bool = True):
+    if coco:
+        args = train_coco_config.parse_arguments(config_file)
+        cyan_print = lambda ss: print("\033[1;36m" + ss + "\033[0m")
+        if args.freeze_backbone_epochs - args.initial_epoch > 0:
+            total_epochs = args.epochs
+            cyan_print(">>>> Train with freezing backbone")
+            args.additional_det_header_kwargs.update({"freeze_backbone": True})
+            args.epochs = args.freeze_backbone_epochs
+            model, latest_save, _ = train_coco_config.run_training_by_args(args)
+
+            cyan_print(">>>> Unfreezing backbone")
+            args.additional_det_header_kwargs.update({"freeze_backbone": False})
+            args.initial_epoch = args.freeze_backbone_epochs
+            args.epochs = total_epochs
+            args.backbone_pretrained = None
+            args.restore_path = None
+            args.pretrained = latest_save  # Build model and load weights
+
+        train_coco_config.run_training_by_args(args)
+    
+    else:
+        args = train_with_config.parse_arguments(config_file)
+        train_with_config.run_training_by_args(args)
+
+
+
 
 
 if __name__ == '__main__':
     # broken_dataset = load_dataset("bloodcells", "BCCD/Annotations", "BCCD/JPEGImages", True, "BCCD/ImageSets/Main/train.txt")
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
-    ds = load_dataset_subset('dogiss', '/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations', '/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages', '../Datasets/VOC2012/ImageSets/Main/dog_train.txt')
-    convert_dataset(ds, 'ground_truth', 'exported')
-    custom_dataset('exported', 0.1, 'train.json')
-    train_coco(8, 512, 'train.json', 20, 1, 8)
+    train_using_config(
+        'train_config.json',
+        False
+    )
+
 
     
