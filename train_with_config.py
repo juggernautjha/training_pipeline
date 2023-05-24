@@ -31,7 +31,7 @@ def parse_arguments(filename):
         basic_save_name = os.path.splitext(os.path.basename(args.restore_path))[0]
         basic_save_name = basic_save_name[:-7] if basic_save_name.endswith("_latest") else basic_save_name
         args.basic_save_name = basic_save_name
-    elif args.basic_save_name is None or args.basic_save_name.startswith("_"):
+    else:
         data_name = args.data_name.replace("/", "_")
         basic_save_name = "{}_{}_{}".format(args.model, filename.split(".")[0], data_name)
         args.basic_save_name = basic_save_name if args.basic_save_name is None else (basic_save_name + args.basic_save_name)
