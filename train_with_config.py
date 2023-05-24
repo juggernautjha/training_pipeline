@@ -10,9 +10,9 @@ class dotdict(dict):
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
-def parse_arguments(file):
+def parse_arguments(filename):
     import json
-    file = open(file, 'r')
+    file = open(filename, 'r')
     # print(file.read())
     args = json.load(file)
     args = dotdict(args)
@@ -33,9 +33,7 @@ def parse_arguments(file):
         args.basic_save_name = basic_save_name
     elif args.basic_save_name is None or args.basic_save_name.startswith("_"):
         data_name = args.data_name.replace("/", "_")
-        basic_save_name = "{}_{}_{}_{}_batchsize_{}".format(args.model, args.input_shape, args.optimizer, data_name, args.batch_size)
-        basic_save_name += "_randaug_{}_mixup_{}_cutmix_{}_RRC_{}".format(args.magnitude, args.mixup_alpha, args.cutmix_alpha, args.random_crop_min)
-        basic_save_name += "_lr512_{}_wd_{}".format(args.lr_base_512, args.weight_decay)
+        basic_save_name = "{}_{}_{}".format(args.model, filename.split(".")[0], data_name)
         args.basic_save_name = basic_save_name if args.basic_save_name is None else (basic_save_name + args.basic_save_name)
     args.enable_float16 = not args.disable_float16
     args.tensorboard_logs = None if args.tensorboard_logs is None or args.tensorboard_logs.lower() == "none" else args.tensorboard_logs

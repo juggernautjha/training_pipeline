@@ -138,10 +138,7 @@ if __name__ == '__main__':
     # broken_dataset = load_dataset("bloodcells", "BCCD/Annotations", "BCCD/JPEGImages", True, "BCCD/ImageSets/Main/train.txt")
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
-    train_using_config(
-        'train_config.json',
-        False
-    )
+    train_using_config('config.json', True)
 
 
     

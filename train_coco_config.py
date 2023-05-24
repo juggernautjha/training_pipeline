@@ -21,8 +21,8 @@ class dotdict(dict):
 
 
 
-def parse_arguments(file):
-    file = open(file, 'r')
+def parse_arguments(filename):
+    file = open(filename, 'r')
     # print(file.read())
     args = json.load(file)
     args = dotdict(args)
@@ -48,11 +48,7 @@ def parse_arguments(file):
         args.basic_save_name = basic_save_name
     elif args.basic_save_name is None or args.basic_save_name.startswith("_"):
         data_name = args.data_name.replace("/", "_")
-        model_name = args.det_header.split(".")[-1] + ("" if args.backbone is None else ("_" + args.backbone.split(".")[-1]))
-        basic_save_name = "{}_{}_{}_{}_batchsize_{}".format(model_name, args.input_shape, args.optimizer, data_name, args.batch_size)
-        basic_save_name += "_randaug_{}_mosaic_{}".format(args.magnitude, args.mosaic_mix_prob)
-        basic_save_name += "_color_{}_position_{}".format(args.color_augment_method, args.positional_augment_methods)
-        basic_save_name += "_lr512_{}_wd_{}_anchors_mode_{}".format(args.lr_base_512, args.weight_decay, args.anchors_mode)
+        basic_save_name = "{}_{}_{}".format(args.model, filename.split(".")[0], data_name)
         args.basic_save_name = basic_save_name if args.basic_save_name is None else (basic_save_name + args.basic_save_name)
     args.enable_float16 = not args.disable_float16
     args.tensorboard_logs = None if args.tensorboard_logs is None or args.tensorboard_logs.lower() == "none" else args.tensorboard_logs
