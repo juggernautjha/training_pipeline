@@ -34,7 +34,7 @@ def parse_arguments(filename):
     else:
         data_name = args.data_name.replace("/", "_")
         basic_save_name = "{}_{}_{}".format(args.model, filename.split(".")[0], data_name)
-        args.basic_save_name = basic_save_name if args.basic_save_name is None else (basic_save_name + args.basic_save_name)
+        args.basic_save_name = basic_save_name if args.basic_save_name is None else (basic_save_name + "_" +args.basic_save_nam)
     args.enable_float16 = not args.disable_float16
     args.tensorboard_logs = None if args.tensorboard_logs is None or args.tensorboard_logs.lower() == "none" else args.tensorboard_logs
 
