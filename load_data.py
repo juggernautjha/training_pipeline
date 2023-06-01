@@ -11,7 +11,7 @@ import subprocess
 import train_coco_config
 import train_with_config 
 
-def load_dataset(name: str, anno_path : str, img_path : str, load_split : bool = False, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
+def load_dataset(anno_path : str, img_path : str, load_split : bool = False, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
     ''' Loads VOC dataset and returns a dataset object. Need to specify directory containing
     data in VOC format, along with annotation path and image set path.  
     Can be used to load splits when the file is of the following format:
@@ -28,7 +28,6 @@ def load_dataset(name: str, anno_path : str, img_path : str, load_split : bool =
             dataset_type=fo.types.VOCDetectionDataset,
             data_path=img_path,
             labels_path=anno_path,
-            name=name
         )
         return dataset
     else:
@@ -37,19 +36,19 @@ def load_dataset(name: str, anno_path : str, img_path : str, load_split : bool =
             dataset_type=fo.types.VOCDetectionDataset,
             data_path=img_path,
             labels_path=anno_path,
-            name=name
         )
         # dataset.filter_field()
         # samples = []
+        temp_Df = fo.Dataset()
         for sample in dataset:
-            if (sample.filepath not in filenames):
-                dataset.delete_samples(sample)
+            if (sample.filepath in filenames):
+                fo.delete_samples(sample)
                 # samples.append(samples)
 
         return dataset
     
 
-def load_dataset_subset(name: str, anno_path : str, img_path : str, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
+def load_dataset_subset(anno_path : str, img_path : str, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
     ''' Loads VOC dataset and returns a dataset object. Need to specify directory containing
     data in VOC format, along with annotation path and image set path.  
     Can be used to load splits when the file is of the following format:
@@ -68,7 +67,6 @@ def load_dataset_subset(name: str, anno_path : str, img_path : str, split_path :
         dataset_type=fo.types.VOCDetectionDataset,
         data_path=img_path,
         labels_path=anno_path,
-        name=name
     )
 
     for sample in dataset:

@@ -8,7 +8,7 @@
     "freeze_backbone_epochs": 5,
     "additional_backbone_kwargs": null,
     "additional_det_header_kwargs": null,
-    "batch_size": 4,
+    "batch_size": 16,
     "epochs": -1,
     "optimizer": "adamw",
     "initial_epoch": 0,
