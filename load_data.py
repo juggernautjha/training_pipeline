@@ -95,6 +95,11 @@ def custom_dataset(converted_dir : str, test_split : float, output_json : str ,b
     '''
     custom_dataset_script.build_detection_dataset_json(f'{converted_dir}/data/', f'{converted_dir}/labels.json', test_split=test_split, bbox_source_format=bbox_format, save_name=output_json)
 
+def custom_dataset_split(train_dir : str, test_dir : str, output_json : str, bbox_format : str = 'xywh') -> None:
+    custom_dataset_script.build_detection_dataset_json(f'{train_dir}/data/', f'{train_dir}/labels.json',f'{test_dir}/data/', f'{test_dir}/labels.json' , bbox_source_format=bbox_format, save_name=output_json)
+    
+
+
 
 def train_coco(batch_size : int, input_shape : int, data_name : str, lr_decay_steps : int, lr_cooldown_steps : int, freeze_backbone_epochs : int):
     '''
@@ -138,7 +143,11 @@ if __name__ == '__main__':
     # broken_dataset = load_dataset("bloodcells", "BCCD/Annotations", "BCCD/JPEGImages", True, "BCCD/ImageSets/Main/train.txt")
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
-    train_using_config('config.json', True)
+    # train_using_config('config.json', True)
+    dataset = load_dataset("hehe", "/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations", "/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages")
+    from sklearn.model_selection import train_test_split
+    # ds_1, ds_2 = train_test_split(dataset, 0.5, 0.5)
+    print(dataset[1])
 
 
     
