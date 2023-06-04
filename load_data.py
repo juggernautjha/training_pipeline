@@ -44,7 +44,7 @@ def load_dataset(anno_path : str, img_path : str, load_split : bool = False, spl
         temp_Df = fo.Dataset()
         for sample in dataset:
             if (sample.filepath in filenames):
-                fo.delete_samples(sample)
+                dataset.delete_samples(sample)
                 # samples.append(samples)
 
         return dataset
@@ -93,7 +93,7 @@ def extract_labels(ann_dir : str, outfile : str):
     #! run it once to extract all labels from annotations. this is required for the next step.
     os.system(f"grep -ERoh '<name>(.*)</name>' {ann_dir} | sort | uniq | sed 's/<name>//g' | sed 's/<\/name>//g' > {outfile}")
 
-def convert_using_voc2coco(ann_dir : str, ann_ids : str, img_dir : str, labels : str, output : str, extract_num : str = "store_true",  extension  : str = 'xml', img_extension : str = 'jpg') -> None:
+def convert_using_voc2coco(ann_dir : str, ann_ids : str, img_dir : str, labels : str, output : str, extract_num : bool = False,  extension  : str = 'xml', img_extension : str = 'jpg') -> None:
     '''
     Creates a directory with the following layout
     dir_name/
@@ -176,6 +176,8 @@ if __name__ == '__main__':
                             labels="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/labels.txt", \
                             img_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages",\
                             output="convertedv2c") 
+    
+    custom_dataset("convertedv2c", 0.1, "lll.json")
 
 
 
