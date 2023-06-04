@@ -7,10 +7,12 @@ import glob
 from tqdm import tqdm
 import custom_dataset_script
 import subprocess
-
+import voc2coco
 import train_coco_config
 import train_with_config 
+import shutil
 
+### NOTE: This uses Voxel51
 def load_dataset(anno_path : str, img_path : str, load_split : bool = False, split_path : str = '', extension : str = 'jpg') -> fo.Dataset:
     ''' Loads VOC dataset and returns a dataset object. Need to specify directory containing
     data in VOC format, along with annotation path and image set path.  
@@ -86,6 +88,33 @@ def convert_dataset(dataset : fo.Dataset, label_field : str, export_dir : str, d
     )
     print("Converted Successfully")
 
+###NOTE: This uses Voc2Coco and DOES require a path list. I'll probably write a wrapper on top of it. TODO.
+def extract_labels(ann_dir : str, outfile : str):
+    #! run it once to extract all labels from annotations. this is required for the next step.
+    os.system(f"grep -ERoh '<name>(.*)</name>' {ann_dir} | sort | uniq | sed 's/<name>//g' | sed 's/<\/name>//g' > {outfile}")
+
+def convert_using_voc2coco(ann_dir : str, ann_ids : str, img_dir : str, labels : str, output : str, extract_num : str = "store_true",  extension  : str = 'xml', img_extension : str = 'jpg') -> None:
+    '''
+    Creates a directory with the following layout
+    dir_name/
+        data/ -> contains the relevant images
+        labels.json -> coco labels.json
+
+    '''
+    if not os.path.exists(f'{output}/data'):
+        os.makedirs(f'{output}/data')
+    slugs = [f'{i.strip()}.jpg' for i in open(ann_ids).readlines()]
+    img_paths = [f'{img_dir}/{i}' for i in slugs]
+    dest_paths = [f'{output}/data/{i}' for i in slugs]
+    for a,b in tqdm(zip(img_paths, dest_paths)):
+        shutil.copy(a, b)
+    label2id = voc2coco.get_label2id(labels)
+    ann_paths = voc2coco.get_annpaths(ann_dir_path=ann_dir, ann_ids_path=ann_ids, ext=extension)
+    voc2coco.convert_xmls_to_cocojson(ann_paths, label2id=label2id, output_jsonpath=f'{output}/labels.json', extract_num_from_imgid=extract_num)
+
+
+
+###NOTE: tool Agnostic.
 def custom_dataset(converted_dir : str, test_split : float, output_json : str ,bbox_format : str = 'xywh') -> None:
     '''
     Basically a wrapper around this command.
@@ -142,10 +171,12 @@ if __name__ == '__main__':
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
     # train_using_config('config.json', True)
-    dataset = load_dataset("hehe", "/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations", "/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages")
-    from sklearn.model_selection import train_test_split
-    # ds_1, ds_2 = train_test_split(dataset, 0.5, 0.5)
-    print(dataset[1])
+    convert_using_voc2coco(ann_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations", \
+                           ann_ids="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/ImageSets/Main/train.txt",\
+                            labels="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/labels.txt", \
+                            img_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages",\
+                            output="convertedv2c") 
+
 
 
     
