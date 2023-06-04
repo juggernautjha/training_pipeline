@@ -93,6 +93,26 @@ def extract_labels(ann_dir : str, outfile : str):
     #! run it once to extract all labels from annotations. this is required for the next step.
     os.system(f"grep -ERoh '<name>(.*)</name>' {ann_dir} | sort | uniq | sed 's/<name>//g' | sed 's/<\/name>//g' > {outfile}")
 
+def convert_all_using_voc2coco(ann_dir : str, img_dir : str, labels : str, output : str, extract_num : bool = False,  extension  : str = 'xml', img_extension : str = 'jpg') -> None:
+    '''
+    Creates a directory with the following layout
+    dir_name/
+        data/ -> contains the relevant images
+        labels.json -> coco labels.json
+
+    '''
+    if not os.path.exists(f'{output}/data'):
+        os.makedirs(f'{output}/data')
+    ann_ids = os.listdir(ann_dir)
+    slugs = [f'{i.split(".")[0]}' for i in ann_ids]
+    img_paths = [f'{img_dir}/{i}.jpg' for i in slugs]
+    dest_paths = [f'{output}/data/{i}.jpg' for i in slugs]
+    for a,b in tqdm(zip(img_paths, dest_paths)):
+        shutil.copy(a, b)
+    label2id = voc2coco.get_label2id(labels)
+    ann_paths = [f'{ann_dir}/{i}' for i in ann_ids]
+    voc2coco.convert_xmls_to_cocojson(ann_paths, label2id=label2id, output_jsonpath=f'{output}/labels.json', extract_num_from_imgid=extract_num)
+
 def convert_using_voc2coco(ann_dir : str, ann_ids : str, img_dir : str, labels : str, output : str, extract_num : bool = False,  extension  : str = 'xml', img_extension : str = 'jpg') -> None:
     '''
     Creates a directory with the following layout
@@ -171,13 +191,12 @@ if __name__ == '__main__':
     # convert_dataset(broken_dataset, 'ground_truth', 'exported')
     # sesh = fo.launch_app(broken_dataset)
     # train_using_config('config.json', True)
-    convert_using_voc2coco(ann_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations", \
-                           ann_ids="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/ImageSets/Main/train.txt",\
-                            labels="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/labels.txt", \
-                            img_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages",\
-                            output="convertedv2c") 
+    # convert_all_using_voc2coco(ann_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/Annotations", \
+    #                         labels="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/labels.txt", \
+    #                         img_dir="/home/juggernautjha/Desktop/Msense/complete_training_pipeline/Datasets/VOC2012/JPEGImages",\
+    #                         output="../testing123") 
     
-    custom_dataset("convertedv2c", 0.1, "lll.json")
+    custom_dataset("../testing123", 0.1, "lll.json")
 
 
 
